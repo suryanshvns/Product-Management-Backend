@@ -5,7 +5,7 @@ dotenv.config();
 const config = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT, 10) || 3000,
-  apiBaseUrl: process.env.API_BASE_URL || '', // e.g. http://localhost:3000 — when set, product images get imageUrl
+  apiBaseUrl: process.env.API_BASE_URL || (process.env.NODE_ENV !== 'production' ? 'http://localhost:3000' : ''),
   database: {
     url: process.env.DATABASE_URL,
   },

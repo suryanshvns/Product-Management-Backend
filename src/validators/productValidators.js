@@ -4,6 +4,7 @@ const createProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   categoryId: z.string().min(1, 'Category is required'),
+  price: z.number().min(0).optional(),
   status: z.enum(['draft', 'active', 'archived']).optional(),
 });
 
@@ -11,6 +12,7 @@ const updateProductSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional(),
   categoryId: z.string().min(1).optional(),
+  price: z.number().min(0).optional(),
   status: z.enum(['draft', 'active', 'archived']).optional(),
 });
 

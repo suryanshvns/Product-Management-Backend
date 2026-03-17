@@ -1,0 +1,91 @@
+name,categoryId,price,stock
+iPhone 15 Pro,cat_electronics,999,50
+Samsung Galaxy S24,cat_electronics,899,40
+Google Pixel 8,cat_electronics,799,35
+OnePlus 12,cat_electronics,699,45
+Xiaomi 14,cat_electronics,649,60
+Sony WH-1000XM5,cat_audio,349,30
+Bose QuietComfort 45,cat_audio,329,25
+JBL Flip 6,cat_audio,149,70
+AirPods Pro 2,cat_audio,249,55
+Boat Rockerz 450,cat_audio,49,100
+MacBook Air M2,cat_laptops,1199,20
+MacBook Pro M3,cat_laptops,1999,15
+Dell XPS 13,cat_laptops,1099,18
+HP Spectre x360,cat_laptops,1249,22
+Lenovo ThinkPad X1,cat_laptops,1399,17
+Asus ROG Zephyrus,cat_laptops,1599,12
+Acer Predator Helios,cat_laptops,1499,14
+Samsung Odyssey Monitor,cat_monitors,399,28
+LG UltraWide Monitor,cat_monitors,499,24
+BenQ GW2780,cat_monitors,199,35
+Logitech MX Master 3,cat_accessories,99,80
+Logitech K380 Keyboard,cat_accessories,49,90
+Apple Magic Mouse,cat_accessories,79,60
+HP Wireless Mouse,cat_accessories,29,120
+Dell USB Keyboard,cat_accessories,25,110
+Canon EOS 1500D,cat_cameras,549,20
+Nikon D5600,cat_cameras,699,15
+Sony Alpha A6400,cat_cameras,899,18
+GoPro Hero 12,cat_cameras,399,30
+DJI Mini 3 Drone,cat_cameras,599,12
+Apple Watch Series 9,cat_wearables,399,50
+Samsung Galaxy Watch 6,cat_wearables,349,45
+Fitbit Charge 6,cat_wearables,179,60
+Noise Smartwatch,cat_wearables,79,80
+Fire-Boltt Ninja,cat_wearables,59,90
+Amazon Echo Dot 5,cat_smart_home,49,100
+Google Nest Mini,cat_smart_home,45,95
+Philips Hue Bulb,cat_smart_home,29,110
+Wipro Smart Bulb,cat_smart_home,19,120
+TP-Link Smart Plug,cat_smart_home,25,105
+Samsung 55 inch TV,cat_tv,799,20
+LG OLED TV,cat_tv,1299,15
+Sony Bravia 4K,cat_tv,999,18
+Mi Smart TV,cat_tv,499,25
+OnePlus TV U1S,cat_tv,599,22
+Nike Air Max,cat_fashion,149,70
+Adidas Ultraboost,cat_fashion,159,65
+Puma Running Shoes,cat_fashion,99,80
+Levi's Jeans,cat_fashion,79,90
+Zara Jacket,cat_fashion,119,50
+H&M T-Shirt,cat_fashion,29,150
+Uniqlo Hoodie,cat_fashion,59,85
+Ray-Ban Sunglasses,cat_fashion,129,40
+Fossil Watch,cat_fashion,199,35
+Casio G-Shock,cat_fashion,149,45
+KitchenAid Mixer,cat_home,399,15
+Philips Air Fryer,cat_home,199,30
+Prestige Pressure Cooker,cat_home,49,100
+Milton Water Bottle,cat_home,15,200
+Cello Lunch Box,cat_home,12,180
+LG Washing Machine,cat_appliances,699,20
+Samsung Refrigerator,cat_appliances,899,18
+Whirlpool AC,cat_appliances,599,22
+Voltas Air Cooler,cat_appliances,149,35
+Havells Fan,cat_appliances,79,60
+Dettol Handwash,cat_grocery,5,300
+Dove Shampoo,cat_grocery,8,250
+Colgate Toothpaste,cat_grocery,3,400
+Maggi Noodles,cat_grocery,2,500
+Amul Butter,cat_grocery,4,350
+Nestle Coffee,cat_grocery,6,280
+Tata Tea,cat_grocery,5,320
+Fortune Oil,cat_grocery,10,200
+Aashirvaad Atta,cat_grocery,12,220
+Surf Excel,cat_grocery,9,260
+Harry Potter Book Set,cat_books,99,40
+Atomic Habits Book,cat_books,15,100
+Rich Dad Poor Dad,cat_books,12,120
+Ikigai Book,cat_books,10,130
+The Alchemist,cat_books,9,140
+Sony PS5,cat_gaming,499,25
+Xbox Series X,cat_gaming,499,20
+Nintendo Switch,cat_gaming,299,30
+Logitech Gaming Mouse,cat_gaming,79,60
+Razer Keyboard,cat_gaming,129,45
+Yonex Badminton Racket,cat_sports,59,70
+Cosco Football,cat_sports,25,100
+Nivia Basketball,cat_sports,30,90
+Decathlon Yoga Mat,cat_sports,20,120
+Adidas Gym Gloves,cat_sports,15,140

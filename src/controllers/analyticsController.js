@@ -1,5 +1,6 @@
 const analyticsService = require('../services/analyticsService');
 const { HTTP_STATUS } = require('../constants');
+const { withImageUrls } = require('../utils/productImages');
 
 const analyticsController = {
   overview: async (req, res, next) => {
@@ -14,7 +15,11 @@ const analyticsController = {
   productsByCategory: async (req, res, next) => {
     try {
       const data = await analyticsService.getProductsByCategory();
-      res.status(HTTP_STATUS.OK).json({ success: true, data: { categories: data } });
+      const categories = data.map((c) => ({
+        ...c,
+        products: withImageUrls(c.products || []),
+      }));
+      res.status(HTTP_STATUS.OK).json({ success: true, data: { categories } });
     } catch (err) {
       next(err);
     }
@@ -24,7 +29,7 @@ const analyticsController = {
     try {
       const limit = req.query.limit ?? 10;
       const products = await analyticsService.getTopProducts(limit);
-      res.status(HTTP_STATUS.OK).json({ success: true, data: { products } });
+      res.status(HTTP_STATUS.OK).json({ success: true, data: { products: withImageUrls(products) } });
     } catch (err) {
       next(err);
     }

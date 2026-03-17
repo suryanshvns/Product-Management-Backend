@@ -1,24 +1,6 @@
 const productService = require('../services/productService');
 const { HTTP_STATUS } = require('../constants');
-const config = require('../config');
-
-/** Attach imageUrl (absolute) to each product image when API_BASE_URL is set. */
-function withImageUrls(productOrProducts) {
-  const base = (config.apiBaseUrl || '').replace(/\/$/, '');
-  const mapOne = (p) => {
-    if (!p || !p.images) return p;
-    return {
-      ...p,
-      images: p.images.map((img) => ({
-        ...img,
-        ...(base && img.url ? { imageUrl: `${base}${img.url.startsWith('/') ? '' : '/'}${img.url}` } : {}),
-      })),
-    };
-  };
-  return Array.isArray(productOrProducts)
-    ? productOrProducts.map(mapOne)
-    : mapOne(productOrProducts);
-}
+const { withImageUrls } = require('../utils/productImages');
 
 const productController = {
   create: async (req, res, next) => {
