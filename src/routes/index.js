@@ -1,0 +1,45 @@
+const express = require('express');
+const healthRoutes = require('./healthRoutes');
+const healthController = require('../controllers/healthController');
+const { ROUTES } = require('../constants/routes');
+const authRoutes = require('./authRoutes');
+const userRoutes = require('./userRoutes');
+const roleRoutes = require('./roleRoutes');
+const productRoutes = require('./productRoutes');
+const categoryRoutes = require('./categoryRoutes');
+const analyticsRoutes = require('./analyticsRoutes');
+const orderRoutes = require('./orderRoutes');
+const organizationRoutes = require('./organizationRoutes');
+const logRoutes = require('./logRoutes');
+const notificationRoutes = require('./notificationRoutes');
+const alertRuleRoutes = require('./alertRuleRoutes');
+const reportRoutes = require('./reportRoutes');
+const dashboardRoutes = require('./dashboardRoutes');
+const settingRoutes = require('./settingRoutes');
+const apiKeyRoutes = require('./apiKeyRoutes');
+const webhookRoutes = require('./webhookRoutes');
+const bulkImportRoutes = require('./bulkImportRoutes');
+
+const router = express.Router();
+
+router.use(ROUTES.HEALTH, healthRoutes);
+router.get(ROUTES.PING, healthController.ping);
+router.use(ROUTES.AUTH, authRoutes);
+router.use(ROUTES.USERS, userRoutes);
+router.use(ROUTES.ROLES, roleRoutes);
+router.use(ROUTES.PRODUCTS, productRoutes);
+router.use(ROUTES.CATEGORIES, categoryRoutes);
+router.use(ROUTES.ANALYTICS, analyticsRoutes);
+router.use(ROUTES.ORDERS, orderRoutes);
+router.use(ROUTES.ORGANIZATIONS, organizationRoutes);
+router.use(ROUTES.LOGS, logRoutes);
+router.use(ROUTES.NOTIFICATIONS, notificationRoutes);
+router.use(ROUTES.ALERT_RULES, alertRuleRoutes);
+router.use(ROUTES.REPORTS, reportRoutes);
+router.use(ROUTES.DASHBOARD, dashboardRoutes);
+router.use(ROUTES.SETTINGS, settingRoutes);
+router.use(ROUTES.API_KEYS, apiKeyRoutes);
+router.use(ROUTES.WEBHOOKS, webhookRoutes);
+router.use(ROUTES.BULK, bulkImportRoutes);
+
+module.exports = router;

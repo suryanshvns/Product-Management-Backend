@@ -1,0 +1,58 @@
+---
+alwaysApply: true
+---
+
+# API Creation Order & Structure
+
+Follow this order when adding or implementing APIs. Use layered architecture: route → validate → controller → service → repository → DB.
+
+## Module implementation order
+
+1. **Authentication** (done: signup, login, logout, me, refresh-token)
+2. **Users** – CRUD, profile, list (protect with `authenticate`)
+3. **Roles & user_roles** – assign/revoke roles
+4. **Products** – CRUD, status, stock (categoryId required)
+5. **Categories** – CRUD (slug unique)
+6. **Inventory** – low-stock, summary (product-scoped)
+7. **Product images** – per product (productId required)
+8. **Activity logs** – list/filter (auth + optional filters)
+9. **Notifications** – list, mark read (auth, user-scoped)
+10. **Analytics events** – record + query (overview, by category, top products)
+
+## Folder-wise flow (per module)
+
+Do in this order so dependencies exist before use:
+
+| Step | Folder                | Action                                                                                                                                  |
+| ---- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
+| 1    | `constants/routes.js` | Add route constant (e.g. `PRODUCTS: '/products'`)                                                                                       |
+| 2    | `validators/`         | New file or export: Zod schema(s) for body/query/params; export in `validators/index.js` if needed                                      |
+| 3    | `repositories/`       | New file: DB access only (Prisma). No business logic, no `req`/`res`. Use `../database/client` for Prisma.                              |
+| 4    | `services/`           | New file: business logic only. Call repository; throw `AppError`/`ValidationError`/`NotFoundError` etc. No `req`/`res`.                 |
+| 5    | `controllers/`        | New file: HTTP only. Read `req.body`/`req.params`/`req.query`; call service; `res.status(...).json(...)`; pass errors with `next(err)`. |
+| 6    | `routes/`             | New file: `express.Router()`, wire method + path, `validate(schema, 'body'                                                              | 'query' | 'params')`, `authenticate` where required, then controller. Export router. |
+| 7    | `routes/index.js`     | Mount: `router.use(ROUTES.<MODULE>, moduleRoutes)`                                                                                      |
+| 8    | `tests/`              | Add unit and/or API tests per `.cursor/rules/testing-flow.mdc` and `docs/TESTING.md`.                                                   |
+
+## Conventions
+
+- **Controllers**: Always use `async (req, res, next)` and `try/catch` with `next(err)`.
+- **Responses**: Use `{ success: true, data: ... }` for success; let error middleware return `{ success: false, error: { code, message, details? } }`.
+- **Validation**: Use `validate(schema, 'body'|'query'|'params')` from `middlewares/validate.js`; schemas in `validators/` with Zod.
+- **Auth**: Use `authenticate` from `middlewares/auth.js` for any route that requires a logged-in user. JWT in `Authorization: Bearer <token>`.
+- **Status codes**: Use `HTTP_STATUS` from `constants/index.js` (e.g. `CREATED`, `OK`, `NOT_FOUND`).
+- **Errors**: Throw `ValidationError`, `UnauthorizedError`, `NotFoundError`, etc. from `utils/errors`; do not catch in controller except to call `next(err)`.
+
+## Example (new module “products”)
+
+```js
+// 1) constants/routes.js – add PRODUCTS: '/products'
+// 2) validators/productValidators.js – createProductSchema, updateProductSchema (Zod)
+// 3) repositories/productRepository.js – create, findById, findMany, update, delete (Prisma)
+// 4) services/productService.js – createProduct, getProduct, listProducts, updateProduct, deleteProduct (call repo, throw errors)
+// 5) controllers/productController.js – create, get, list, update, delete (req/res, call service, next(err))
+// 6) routes/productRoutes.js – POST /, GET /, GET /:id, PATCH /:id, DELETE /:id with validate + authenticate where needed
+// 7) routes/index.js – router.use(ROUTES.PRODUCTS, productRoutes)
+```
+
+Do not add new APIs without following this order and structure.

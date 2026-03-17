@@ -1,0 +1,63 @@
+---
+description: How and when to write tests for this backend
+globs: tests/**/*.js
+alwaysApply: false
+---
+
+# Testing Flow & Conventions
+
+## Stack
+
+- **Runner:** Node.js built-in (`node:test`)
+- **Assertions:** `node:assert`
+- **API tests:** `supertest` with app from `tests/helpers/app`
+
+Run: `npm test`
+
+## When to write tests (order)
+
+1. Implement the module (constants → validators → repositories → services → controllers → routes).
+2. Add tests for that module:
+   - **Unit:** service (and optionally repository) in `tests/<module>.test.js`.
+   - **API:** routes in same file or `tests/api/<module>.test.js` using `request(require('./helpers/app'))`.
+
+## What to test
+
+| Layer | Test type | What to assert |
+|-------|-----------|----------------|
+| Service | Unit | Return value for valid input; throws correct error for invalid/missing data. Mock repo if needed. |
+| Routes | API (supertest) | Status code, `res.body.success`, `res.body.data` or `res.body.error`. For auth routes: token present or 401. |
+
+## Conventions
+
+- One test file per module (e.g. `auth.test.js`, `products.test.js`).
+- Use `describe('<module>')` and `describe('GET /api/...')`; use `it('should ...')` with a clear outcome.
+- Do **not** call `app.listen()`; use `supertest(app)` so the app is invoked without a server.
+- For protected routes: in the test, call login (or signup), then use `res.body.data.accessToken` and set `Authorization: Bearer <token>` on the next request.
+- API tests that use the real DB need a seeded DB or a test database (e.g. `.env.test` with `DATABASE_URL`).
+
+## Example (API test)
+
+```js
+const { describe, it } = require('node:test');
+const assert = require('node:assert');
+const request = require('supertest');
+const app = require('./helpers/app');
+
+describe('POST /api/auth/login', () => {
+  it('should return 400 when body is invalid', async () => {
+    const res = await request(app).post('/api/auth/login').send({});
+    assert.strictEqual(res.status, 400);
+    assert.strictEqual(res.body.success, false);
+  });
+  it('should return 200 and tokens for valid credentials', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'admin@company.com', password: 'test' });
+    assert.strictEqual(res.status, 200);
+    assert.ok(res.body.data.accessToken);
+  });
+});
+```
+
+See `docs/TESTING.md` for full guide.
