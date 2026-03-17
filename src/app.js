@@ -13,7 +13,7 @@ const app = express();
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 const corsOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
-  : ['http://localhost:3001'];
+  : ['http://localhost:3001', 'https://product-management-frontend-eight.vercel.app'];
 app.use(
   cors({
     origin: corsOrigins.length ? corsOrigins : true,
