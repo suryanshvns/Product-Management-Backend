@@ -12,17 +12,42 @@ const slugify = (text) =>
 
 const main = async () => {
   console.log('Cleaning existing data...');
+  await prisma.invoice.deleteMany();
+  await prisma.orderComment.deleteMany();
+  await prisma.orderApproval.deleteMany();
   await prisma.analyticsEvent.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.activityLog.deleteMany();
   await prisma.orderStatusHistory.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.quoteLineItem.deleteMany();
+  await prisma.quote.deleteMany();
+  await prisma.customerAddress.deleteMany();
+  await prisma.customer.deleteMany();
+  await prisma.coupon.deleteMany();
+  await prisma.invoiceCounter.deleteMany();
+  await prisma.customerGroup.deleteMany();
+  await prisma.reportSchedule.deleteMany();
+  await prisma.priceListItem.deleteMany();
+  await prisma.priceList.deleteMany();
+  await prisma.scheduledPrice.deleteMany();
+  await prisma.bulkPriceTier.deleteMany();
+  await prisma.productComment.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.wishlistItem.deleteMany();
+  await prisma.productTag.deleteMany();
+  await prisma.inventoryBatch.deleteMany();
+  await prisma.productRelation.deleteMany();
+  await prisma.productVariant.deleteMany();
+  await prisma.tag.deleteMany();
   await prisma.productStatusHistory.deleteMany();
   await prisma.inventory.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.organizationMember.deleteMany();
+  await prisma.organization.deleteMany();
   await prisma.session.deleteMany();
   await prisma.userRole.deleteMany();
   await prisma.role.deleteMany();
@@ -113,6 +138,11 @@ const main = async () => {
     });
   }
   await prisma.session.createMany({ data: sessionData });
+
+  console.log('Seeding organization...');
+  const defaultOrg = await prisma.organization.create({
+    data: { name: 'Default Organization', slug: 'default-org' },
+  });
 
   console.log('Seeding categories...');
   const categoryData = [
@@ -396,6 +426,153 @@ const main = async () => {
     });
   }
 
+  console.log('Seeding tags...');
+  const tagNames = ['sale', 'new', 'bestseller', 'featured', 'clearance', 'limited', 'organic', 'premium', 'eco-friendly', 'handmade', 'trending', 'gift', 'seasonal', 'exclusive', 'staff-pick'];
+  const tags = [];
+  for (const name of tagNames) {
+    tags.push(await prisma.tag.create({ data: { name, slug: slugify(name) } }));
+  }
+
+  console.log('Seeding product_variants...');
+  const variants = [];
+  for (let i = 0; i < products.length; i++) {
+    const product = products[i];
+    const inv = await prisma.inventory.findUnique({ where: { productId: product.id } });
+    const qty = inv ? inv.quantity : 10;
+    const sku = `SKU-${String(i + 1).padStart(5, '0')}`;
+    const barcode = `8${String(i + 1).padStart(11, '0')}`;
+    variants.push(
+      await prisma.productVariant.create({
+        data: {
+          productId: product.id,
+          sku,
+          barcode,
+          name: 'Standard',
+          attributes: {},
+          quantity: qty,
+          reorderPoint: 5,
+          reorderQty: 20,
+        },
+      })
+    );
+  }
+
+  console.log('Seeding product_tags...');
+  for (let i = 0; i < products.length; i++) {
+    const tagIds = [tags[i % 3].id, tags[(i + 1) % 5].id];
+    for (const tagId of tagIds) {
+      await prisma.productTag.upsert({
+        where: { productId_tagId: { productId: products[i].id, tagId } },
+        create: { productId: products[i].id, tagId },
+        update: {},
+      }).catch(() => {});
+    }
+  }
+
+  console.log('Seeding inventory_batches...');
+  for (let i = 0; i < Math.min(50, variants.length); i++) {
+    const v = variants[i];
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + 6);
+    await prisma.inventoryBatch.create({
+      data: {
+        productVariantId: v.id,
+        batchNumber: `BATCH-${String(i + 1).padStart(4, '0')}`,
+        expiryDate: expiry,
+        quantity: Math.min(20, v.quantity),
+      },
+    });
+  }
+
+  console.log('Seeding product_relations...');
+  for (let i = 0; i < 60; i++) {
+    const a = i % products.length;
+    let b = (i * 7 + 11) % products.length;
+    if (a === b) b = (b + 1) % products.length;
+    try {
+      await prisma.productRelation.create({
+        data: { productId: products[a].id, relatedProductId: products[b].id, relationType: i % 3 === 0 ? 'upsell' : 'related' },
+      });
+    } catch (_) {}
+  }
+
+  console.log('Seeding customer_groups...');
+  const groupNames = ['Retail', 'Wholesale', 'VIP', 'Enterprise', 'Reseller'];
+  const customerGroups = [];
+  for (const name of groupNames) {
+    customerGroups.push(await prisma.customerGroup.create({ data: { name, slug: slugify(name) } }));
+  }
+
+  console.log('Seeding customers...');
+  const customers = [];
+  const companyNames = ['Acme Corp', 'Global Supplies', 'Tech Retail Inc', 'Home & Living Co', 'Fashion Outlet', 'Office Plus', 'Health First', 'Sports Direct'];
+  for (let i = 0; i < 50; i++) {
+    const group = customerGroups[i % customerGroups.length];
+    customers.push(
+      await prisma.customer.create({
+        data: {
+          customerGroupId: group.id,
+          companyName: companyNames[i % companyNames.length] + (i > 7 ? ` ${i}` : ''),
+          contactName: `Contact ${i + 1}`,
+          email: `customer${i + 1}@example.com`,
+          phone: `+1-555-${String(i).padStart(3, '0')}`,
+          userId: i < 10 ? users[i].id : null,
+        },
+      })
+    );
+  }
+
+  console.log('Seeding customer_addresses...');
+  for (let i = 0; i < customers.length; i++) {
+    await prisma.customerAddress.create({
+      data: {
+        customerId: customers[i].id,
+        label: 'Primary',
+        line1: `${100 + i} Main St`,
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'USA',
+        isDefault: true,
+      },
+    });
+    if (i % 2 === 0) {
+      await prisma.customerAddress.create({
+        data: {
+          customerId: customers[i].id,
+          label: 'Billing',
+          line1: `${200 + i} Oak Ave`,
+          city: 'Brooklyn',
+          state: 'NY',
+          postalCode: '11201',
+          country: 'USA',
+          isDefault: false,
+        },
+      });
+    }
+  }
+
+  console.log('Seeding coupons...');
+  const couponCodes = ['WELCOME10', 'SAVE20', 'FLAT50', 'SUMMER25', 'FREESHIP', 'BULK15', 'NEWUSER', 'VIP30', 'HOLIDAY40', 'CLEARANCE', 'EXTRA5', 'MEGA20', 'SHIPFREE', 'DEAL10', 'OFF25'];
+  const coupons = [];
+  for (let i = 0; i < couponCodes.length; i++) {
+    const isPercent = i % 2 === 0;
+    coupons.push(
+      await prisma.coupon.create({
+        data: {
+          code: couponCodes[i],
+          discountType: isPercent ? 'PERCENT' : 'FIXED',
+          value: isPercent ? 10 + (i % 20) : 5 + i * 2,
+          minOrderAmount: i % 3 === 0 ? 50 : null,
+          validFrom: new Date(),
+          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          maxUses: i % 4 === 0 ? 100 : null,
+          isActive: true,
+        },
+      })
+    );
+  }
+
   console.log('Seeding orders...');
   const orderStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
   const unitPrices = [9.99, 14.99, 29.99, 49.99, 79.99, 99.99, 19.99, 34.99];
@@ -405,11 +582,16 @@ const main = async () => {
     const status = orderStatuses[o % orderStatuses.length];
     const orderUser = orderUserPool[o % orderUserPool.length];
     const createdAt = new Date(Date.now() - (o + 1) * 24 * 60 * 60 * 1000);
+    const customerId = o % 3 === 0 && customers[customers.length - 1] ? customers[o % customers.length].id : null;
+    const shippingAddress = customerId ? { line1: '123 Ship St', city: 'Boston', state: 'MA', postalCode: '02101', country: 'USA' } : null;
     const order = await prisma.order.create({
       data: {
         userId: orderUser.id,
+        customerId,
         status,
         totalAmount: null,
+        shippingAddress,
+        customerNote: o % 5 === 0 ? 'Please deliver after 5pm' : null,
         createdAt,
       },
     });
@@ -612,6 +794,69 @@ const main = async () => {
       },
     });
   }
+
+  console.log('Seeding reviews...');
+  for (let i = 0; i < 80; i++) {
+    const product = products[i % products.length];
+    const user = users[i % users.length];
+    try {
+      await prisma.review.create({
+        data: {
+          productId: product.id,
+          userId: user.id,
+          rating: 1 + (i % 5),
+          comment: i % 3 === 0 ? `Great product! Seed review ${i + 1}.` : null,
+          createdAt: new Date(Date.now() - (i + 1) * 24 * 60 * 60 * 1000),
+        },
+      });
+    } catch (_) {}
+  }
+
+  console.log('Seeding wishlist_items...');
+  for (let i = 0; i < 75; i++) {
+    const user = users[i % users.length];
+    const product = products[(i * 3) % products.length];
+    try {
+      await prisma.wishlistItem.create({
+        data: { userId: user.id, productId: product.id },
+      });
+    } catch (_) {}
+  }
+
+  console.log('Seeding price_lists...');
+  const priceLists = [];
+  const plNames = ['Retail Default', 'Wholesale', 'VIP Pricing', 'Promo Q1', 'B2B'];
+  for (let i = 0; i < plNames.length; i++) {
+    priceLists.push(
+      await prisma.priceList.create({
+        data: {
+          name: plNames[i],
+          customerGroupId: i > 0 ? customerGroups[i - 1].id : null,
+          isDefault: i === 0,
+        },
+      })
+    );
+  }
+  for (let i = 0; i < 40; i++) {
+    const pl = priceLists[i % priceLists.length];
+    const v = variants[i % variants.length];
+    const basePrice = 10 + (i % 90);
+    const price = pl.name.includes('Wholesale') ? basePrice * 0.85 : pl.name.includes('VIP') ? basePrice * 0.9 : basePrice;
+    try {
+      await prisma.priceListItem.upsert({
+        where: { priceListId_productVariantId: { priceListId: pl.id, productVariantId: v.id } },
+        create: { priceListId: pl.id, productVariantId: v.id, price },
+        update: { price },
+      });
+    } catch (_) {}
+  }
+
+  console.log('Seeding invoice_counter...');
+  await prisma.invoiceCounter.upsert({
+    where: { organizationId: defaultOrg.id },
+    create: { organizationId: defaultOrg.id, nextNumber: 1 },
+    update: {},
+  }).catch(() => {});
 
   console.log('Seed completed successfully.');
 };

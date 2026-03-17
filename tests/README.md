@@ -1,47 +1,31 @@
-# Tests
+# API tests
 
-API tests use Node.js built-in test runner and supertest. They hit the real app (no server) and require a **running database with migrations applied and seed data**.
-
-## Before running tests
-
-```bash
-# Apply all migrations (creates Order, Organization, AlertRule, etc.)
-npm run db:migrate
-
-# Seed users, products, categories, etc.
-npm run db:seed
-```
-
-Then:
-
-```bash
-npm test
-```
-
-## Test files
+Run: `npm test` (requires DB seeded: `npm run db:seed`).
 
 | File | APIs covered |
 |------|----------------|
-| `auth.test.js` | signup, login, logout, me, refresh-token |
-| `health.test.js` | GET /api/health, GET /api/ping |
-| `products.test.js` | products CRUD, status, stock, bulk, images |
-| `categories.test.js` | categories CRUD |
-| `analytics.test.js` | overview, products-by-category, top-products, inventory-status |
-| `orders.test.js` | create, list, get, update status |
-| `organizations.test.js` | create, list, get, members |
-| `logs.test.js` | GET /api/logs |
-| `notifications.test.js` | list, read-all |
-| `alertRules.test.js` | alert rules CRUD |
-| `reports.test.js` | sales, inventory, export products |
-| `dashboard.test.js` | GET /api/dashboard/summary |
-| `settings.test.js` | get, set, list |
-| `apiKeys.test.js` | create, list, revoke |
-| `webhooks.test.js` | webhooks CRUD |
-| `bulk.test.js` | POST /api/bulk/import/products |
-| `users.test.js` | GET /api/users |
-| `roles.test.js` | GET /api/roles |
+| `auth.test.js` | `/api/auth/*` |
+| `health.test.js` | `/api/health`, `/api/ping` |
+| `users.test.js` | `/api/users` |
+| `roles.test.js` | `/api/roles` |
+| `categories.test.js` | `/api/categories` |
+| `products.test.js` | `/api/products` |
+| `orders.test.js` | `/api/orders` (incl. shipping, coupon, status workflow) |
+| `organizations.test.js` | `/api/organizations` |
+| `analytics.test.js` | `/api/analytics` |
+| `notifications.test.js` | `/api/notifications` |
+| `logs.test.js` | `/api/logs` |
+| `alertRules.test.js` | `/api/alert-rules` |
+| `reports.test.js` | `/api/reports` |
+| `dashboard.test.js` | `/api/dashboard` |
+| `settings.test.js` | `/api/settings` |
+| `apiKeys.test.js` | `/api/api-keys` |
+| `webhooks.test.js` | `/api/webhooks` |
+| `bulk.test.js` | `/api/bulk` |
+| **`catalog-advanced.test.js`** | `/api/search/products`, `/api/product-variants`, `/api/tags`, `/api/inventory-batches`, `/api/related-products` |
+| **`coupons-invoices.test.js`** | `/api/coupons`, `/api/invoices` |
+| **`customers-quotes.test.js`** | `/api/customer-groups`, `/api/customers`, `/api/customer-addresses`, `/api/quotes` |
+| **`engagement.test.js`** | `/api/reviews`, `/api/wishlist` |
+| **`price-lists.test.js`** | `/api/price-lists` |
 
-## Helper
-
-- `helpers/app.js` – Express app for supertest.
-- `helpers/auth.js` – `getToken()` (login as admin@company.com), `authHeader(token)`.
+Helpers: `helpers/app.js`, `helpers/auth.js` (admin token + `authHeader`).

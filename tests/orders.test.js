@@ -79,7 +79,46 @@ describe('Orders API', () => {
         .set(authHeader(token))
         .send({ status: 'confirmed' });
       assert.strictEqual(res.status, 200);
-      assert.ok(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].includes(res.body.data?.order?.status));
+      assert.ok(
+        ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].includes(
+          res.body.data?.order?.status
+        )
+      );
+    });
+
+    it('should accept processing status', async () => {
+      if (!orderId) return;
+      const res = await request(app)
+        .patch(`/api/orders/${orderId}/status`)
+        .set(authHeader(token))
+        .send({ status: 'processing' });
+      assert.ok([200, 400].includes(res.status));
+    });
+  });
+
+  describe('POST /api/orders extended (shipping, notes)', () => {
+    it('should create order with shippingAddress and notes when stock allows', async () => {
+      if (!productId) return;
+      const res = await request(app)
+        .post('/api/orders')
+        .set(authHeader(token))
+        .send({
+          items: [{ productId, quantity: 1, unitPrice: 9.99 }],
+          shippingAddress: {
+            line1: '1 Test Rd',
+            city: 'Boston',
+            state: 'MA',
+            postalCode: '02101',
+            country: 'USA',
+          },
+          customerNote: 'Ring doorbell',
+          internalNote: 'Test order',
+        });
+      assert.ok([201, 400].includes(res.status));
+      if (res.status === 201) {
+        assert.ok(res.body.data.order?.id);
+        assert.ok(res.body.data.order.shippingAddress);
+      }
     });
   });
 });

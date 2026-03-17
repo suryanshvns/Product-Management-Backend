@@ -5,7 +5,7 @@ const app = require('./helpers/app');
 
 describe('Health service', () => {
   it('should export getHealth', () => {
-    const healthService = require('../src/services/healthService');
+    const healthService = require('../src/modules/platform/health.service');
     assert.strictEqual(typeof healthService.getHealth, 'function');
   });
 });

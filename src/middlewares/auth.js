@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const { UnauthorizedError, ForbiddenError } = require('../utils/errors');
 const logger = require('../utils/logger');
-const apiKeyService = require('../services/apiKeyService');
+const apiKeyService = require('../modules/platform/api-key.service');
 
 const authenticate = async (req, res, next) => {
   try {
